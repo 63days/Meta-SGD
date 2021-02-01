@@ -1,6 +1,6 @@
 import torch
 from sinusoid import Sinusoid
-from meta import MetaSGD
+from meta import MetaSGD, MAML
 from torch.utils.data import DataLoader
 import argparse
 from tqdm import tqdm
@@ -10,8 +10,11 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def main(args):
     print(device)
+    if args.method is 'maml':
+        meta = MAML(inner_lr=1e-2, outer_lr=args.outer_lr)
+    else:
+        meta = MetaSGD(outer_lr=args.outer_lr)
 
-    meta = MetaSGD(outer_lr=args.outer_lr)
     meta.to(device)
 
     train_ds = Sinusoid(k_shot=args.k_shot, q_query=10, num_tasks=1000000)
@@ -32,17 +35,23 @@ def main(args):
            losses.append(loss)
 
     torch.save({
-        'model_state_dict': meta.state_dict,
+        'model_state_dict': meta.state_dict(),
         'losses': losses
-    }, 'ckpt/meta_sgd.ckpt')
+    }, f'ckpt/{args.method}.ckpt')
 
     plt.plot(losses)
-    plt.savefig('results/loss_graph.png', dpi=300)
+    plt.savefig(f'results/{args.method}_loss_graph.png', dpi=300)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Meta SGD')
+    parser = argparse.ArgumentParser(description='Meta-SGD')
 
+    parser.add_argument(
+        '--method',
+        type=str,
+        default='maml',
+        choices=['meta_sgd', 'maml']
+    )
     parser.add_argument(
         '--epochs',
         type=int,
