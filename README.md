@@ -1,5 +1,5 @@
 # Meta-SGD: Pytorch Implementation
-An Pytorch Implementation of the __"Meta-SGD"__. 
+A Pytorch Implementation of the __"Meta-SGD"__. 
 
 In this repo, I experimented on K-shot sinusoid regression of Meta-SGD and compared its performacne with MAML.
 ## Pseudocode
