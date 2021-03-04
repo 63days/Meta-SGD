@@ -10,7 +10,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def main(args):
     print(device)
-    if args.method is 'maml':
+    if args.method == 'maml':
         meta = MAML(inner_lr=1e-2, outer_lr=args.outer_lr)
     else:
         meta = MetaSGD(outer_lr=args.outer_lr)
